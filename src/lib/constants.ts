@@ -1,7 +1,7 @@
-// https://techmed-project.vercel.app/api
+// https://techmed-employees.vercel.app/api
 // http://localhost:3000/api
 
-export const API_URL = "http://localhost:3000/api"
+export const API_URL = "https://techmed-employees.vercel.app/api"
 export const COOKIE_NAME = "techmed-employee-token"
 export const defaultExpirationToken = Date.now() + 24 * 60 * 60 * 1000 * 30
 export const userImagePlaceholder = `/logo.png`
