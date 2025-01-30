@@ -7,8 +7,6 @@
 .yarn/install-state.gz
 
 
-/prisma
-
 /menu
 
 # testing

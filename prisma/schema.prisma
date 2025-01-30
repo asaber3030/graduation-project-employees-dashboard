@@ -1,0 +1,442 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_HOST")
+}
+
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_LOCALHOST")
+// }
+
+enum Gender {
+  Male
+  Female
+}
+
+model Hospital {
+  id          Int    @id @default(autoincrement())
+  name        String
+  logo        String
+  description String
+  location    String
+  password    String @default("123456")
+
+  doctors          Doctor[]
+  departments      Department[]
+  employees        Employee[]
+  examinationForms ExaminationForm[]
+  admins           Admin[]
+  inventories      Inventory[]
+  medicine         Medicine[]
+  prescriptions    Prescription[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("hospitals")
+}
+
+model ResourcePermissionGroup {
+  id        Int    @id @default(autoincrement())
+  groupName String @unique
+  groupCode String @unique
+  groupUrl       String @default("/dashboard")
+  groupIcon String @default("patients")
+
+  permissions ResourcePermission[]
+
+  @@map("resource_permission_groups")
+}
+
+model ResourcePermission {
+  id             Int    @id @default(autoincrement())
+  permissionName String @unique
+  permissionCode String @unique
+  groupId        Int
+
+  group ResourcePermissionGroup @relation(fields: [groupId], references: [id])
+
+  employeePermission EmployeePermission[]
+
+  @@map("resource_permissions")
+}
+
+model EmployeePermission {
+  id           Int @id @default(autoincrement())
+  employeeId   Int
+  permissionId Int
+
+  employee   Employee           @relation(fields: [employeeId], references: [id])
+  permission ResourcePermission @relation(fields: [permissionId], references: [id])
+
+  @@map("employee_permissions")
+}
+
+model Patient {
+  id                    Int     @id @default(autoincrement())
+  name                  String
+  password              String
+  phoneNumber           String  @unique
+  email                 String  @unique
+  nationalId            String  @unique
+  emergencyContactName  String
+  emergencyContactPhone String
+  allergies             String
+  gender                Gender
+  image                 String?
+  nationalIdImage       String?
+  birthCertificateImage String?
+
+  maritalStatus String?
+
+  birthDate DateTime?
+  age       Int
+
+  adresses         Address[]
+  vaccinations     PatientVaccination[]
+  medications      PatientMedication[]
+  prescriptions    Prescription[]
+  examinationForms ExaminationForm[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("patients")
+}
+
+model PatientVaccination {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  vaccineName  String
+  vaccineDate  DateTime
+  vaccineNotes String
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("patients_vaccinations")
+}
+
+model PatientMedication {
+  id         Int      @id @default(autoincrement())
+  dosage     String
+  startDate  DateTime
+  endDate    DateTime
+  notes      String
+  medicineId Int
+  patientId  Int
+
+  patient  Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  medicine Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("patients_medications")
+}
+
+model Prescription {
+  id         Int @id @default(autoincrement())
+  hospitalId Int
+  patientId  Int
+  doctorId   Int
+
+  hospital Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  patient  Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  doctor   Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  items PrescriptionItem[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("prescriptions")
+}
+
+model PrescriptionItem {
+  id             Int    @id @default(autoincrement())
+  quantity       Int
+  dosage         String @default("")
+  duration       String @default("")
+  notes          String
+  timesPerDay    Int
+  medicineId     Int
+  prescriptionId Int
+
+  medicine     Medicine     @relation(fields: [medicineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("prescription_items")
+}
+
+model Admin {
+  id          Int      @id @default(autoincrement())
+  name        String
+  password    String
+  phoneNumber String   @unique
+  email       String   @unique
+  hospitalId  Int
+  hospital    Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  logs          AdminLog[]
+  notifications AdminNotification[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("admins")
+}
+
+model Address {
+  id          Int     @id @default(autoincrement())
+  phoneNumber String  @unique
+  streetName  String
+  notes       String
+  homeNumber  String
+  patientId   Int
+  patient     Patient @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("patients_addresses")
+}
+
+model Doctor {
+  id Int @id @default(autoincrement())
+
+  username     String @unique
+  name         String
+  image        String @default("/defaults/icons/user-svg.svg")
+  jobTitle     String
+  password     String
+  phoneNumber  String @unique
+  email        String @unique
+  hospitalId   Int
+  departmentId Int
+
+  hospital     Hospital             @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  department   Department           @relation(fields: [departmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  presepctions Prescription[]
+  loginHistory DoctorLoginHistory[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("doctors")
+}
+
+model DoctorLoginHistory {
+  id        Int      @id @default(autoincrement())
+  os        String   @default("/defaults/os/windows.svg")
+  browser   String   @default("Chrome")
+  device    String
+  ip        String
+  doctorId  Int
+  createdAt DateTime @default(now()) @db.Timestamp()
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+
+  @@map("doctors_login_history")
+}
+
+model Department {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  hospitalId  Int
+  hospital    Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  doctors          Doctor[]
+  emloyees         Employee[]
+  examinationForms ExaminationForm[]
+  inventories      Inventory[]
+
+  @@map("departments")
+}
+
+model Inventory {
+  id           Int    @id @default(autoincrement())
+  name         String
+  description  String
+  code         String @unique
+  hospitalId   Int
+  departmentId Int
+
+  hospital   Hospital   @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  medicine Medicine[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("inventories")
+}
+
+model DosageForm {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+
+  medicine Medicine[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("medicine_dosage_forms")
+}
+
+model Medicine {
+  id Int @id @default(autoincrement())
+
+  dosageFormId Int
+  inventoryId  Int
+  hospitalId   Int
+
+  enName               String
+  arName               String
+  enDescription        String
+  arDescription        String
+  activeIngredients    String
+  totalTablets         Int
+  bgColor              String?   @default("white")
+  textColor            String?   @default("black")
+  notes                String?
+  barcode              String?
+  image                String?
+  concentration        String?
+  price                Float
+  numberOfTape         Int       @default(1)
+  numberOfPillsPerTape Int       @default(0)
+  expirationDate       DateTime?
+
+  hospital           Hospital             @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  inventory          Inventory            @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  dosageForm         DosageForm           @relation(fields: [dosageFormId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ingredients        MedicineIngredient[]
+  patientMedications PatientMedication[]
+  prescriptionItems  PrescriptionItem[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("medicines")
+}
+
+model MedicineIngredient {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  medicineId  Int
+  medicine    Medicine @relation(fields: [medicineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("medicine_ingredients")
+}
+
+model Employee {
+  id          Int     @id @default(autoincrement())
+  name        String
+  username    String  @unique
+  phoneNumber String  @unique
+  email       String  @unique
+  password    String
+  jobTitle    String
+  image       String  @default("/defaults/icons/user-svg.svg")
+  status      Boolean @default(true)
+
+  hospitalId   Int
+  departmentId Int
+
+  hospital      Hospital               @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  department    Department             @relation(fields: [departmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission    EmployeePermission[]
+  logs          EmployeeLog[]
+  notifications EmployeeNotification[]
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("employees")
+}
+
+model ExaminationForm {
+  id Int @id @default(autoincrement())
+
+  date             DateTime
+  hasBloodPressure Boolean  @default(false)
+  hasBloodSugar    Boolean  @default(false)
+
+  hospitalId   Int
+  departmentId Int
+  patientId    Int
+
+  patient    Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  hospital   Hospital   @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@map("examination_forms")
+}
+
+model AdminNotification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  url         String?
+  adminId     Int
+  createdAt   DateTime @default(now()) @db.Timestamp()
+
+  admin Admin @relation(fields: [adminId], references: [id])
+
+  @@map("admins_notification")
+}
+
+model AdminLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  action    String
+  type      String?  @default("/defaults/icons/empty.svg")
+  createdAt DateTime @default(now()) @db.Timestamp()
+  admin     Admin    @relation(fields: [adminId], references: [id])
+
+  @@map("admins_logs")
+}
+
+model EmployeeLog {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  action     String
+  type       String?  @default("/defaults/icons/empty.svg")
+  createdAt  DateTime @default(now()) @db.Timestamp()
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  @@map("employees_logs")
+}
+
+model EmployeeNotification {
+  id          Int     @id @default(autoincrement())
+  employeeId  Int
+  title       String
+  description String?
+  url         String?
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  employee  Employee @relation(fields: [employeeId], references: [id])
+
+  @@map("employees_notification")
+}
