@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: employees-dashboard-db-new
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: employees_dashboard
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: employees-dashboard-app
+    restart: unless-stopped
+    ports:
+      - "3003:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_HOST=postgresql://postgres:postgres123@postgres:5432/employees_dashboard
+      - NEXTAUTH_SECRET=your-secret-key-here
+      - NEXTAUTH_URL=http://localhost:3003
+      - NEXT_PUBLIC_SUPABASE_URL=https://demo.supabase.co
+      - SUPABASE_PUBLIC_KEY=demo-key-placeholder
+      - ADMIN_SECRET=super-secret-jwt-key-for-development
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    volumes:
+      - ./uploads:/app/uploads
+
+  # Redis (for caching and sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: employees-dashboard-redis-new
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
