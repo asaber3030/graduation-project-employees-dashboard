@@ -16,6 +16,24 @@ export const employeesRoutes = {
     departments: (hospitalId: number) => `/dashboard/hospitals/${hospitalId}/departments`,
     prescriptions: (hospitalId: number) => `/dashboard/hospitals/${hospitalId}/prescriptions`
   },
+  products: {
+    root: "/dashboard/products",
+    create: "/dashboard/products/create",
+    update: (productId: number) => `/dashboard/products/${productId}/update`,
+    view: (productId: number) => `/dashboard/products/${productId}`
+  },
+  categories: {
+    root: "/dashboard/categories",
+    create: "/dashboard/categories/create",
+    update: (categoryId: number) => `/dashboard/categories/${categoryId}/update`,
+    view: (categoryId: number) => `/dashboard/categories/${categoryId}`
+  },
+  orders: {
+    root: "/dashboard/orders",
+    create: "/dashboard/orders/create",
+    update: (orderId: number) => `/dashboard/orders/${orderId}/update`,
+    view: (orderId: number) => `/dashboard/orders/${orderId}`
+  },
 
   admins: {
     root: "/dashboard/admins",
@@ -29,8 +47,7 @@ export const employeesRoutes = {
     create: "/dashboard/permissions/create",
     update: (groupId: number) => `/dashboard/permissions/${groupId}/update`,
     view: (groupId: number) => `/dashboard/permissions/${groupId}`,
-    viewPermission: (groupId: number, permissionId: number) =>
-      `/dashboard/permissions/${groupId}/permissions/${permissionId}`
+    viewPermission: (groupId: number, permissionId: number) => `/dashboard/permissions/${groupId}/permissions/${permissionId}`
   },
 
   patients: {
@@ -66,8 +83,7 @@ export const employeesRoutes = {
     create: "/dashboard/employees/create",
     update: (employeeId: number) => `/dashboard/employees/${employeeId}/update`,
     view: (employeeId: number) => `/dashboard/employees/${employeeId}`,
-    employeePrescriptions: (employeeId: number) =>
-      `/dashboard/employees/${employeeId}/prescriptions`,
+    employeePrescriptions: (employeeId: number) => `/dashboard/employees/${employeeId}/prescriptions`,
     employeePermissions: (employeeId: number) => `/dashboard/employees/${employeeId}/permissions`,
     employeeLogs: (employeeId: number) => `/dashboard/employees/${employeeId}/logs`
   },
@@ -79,29 +95,25 @@ export const employeesRoutes = {
     update: (departmentId: number) => `/dashboard/departments/${departmentId}/update`,
 
     view: (departmentId: number) => `/dashboard/departments/${departmentId}`,
-    departmentInventories: (departmentId: number) =>
-      `/dashboard/departments/${departmentId}/inventories`,
+    departmentInventories: (departmentId: number) => `/dashboard/departments/${departmentId}/inventories`,
     departmentDoctors: (departmentId: number) => `/dashboard/departments/${departmentId}/doctors`,
-    departmentExaminationForms: (departmentId: number) =>
-      `/dashboard/departments/${departmentId}/examination-forms`,
-    departmentEmployees: (departmentId: number) =>
-      `/dashboard/departments/${departmentId}/employees`
+    departmentExaminationForms: (departmentId: number) => `/dashboard/departments/${departmentId}/examination-forms`,
+    departmentEmployees: (departmentId: number) => `/dashboard/departments/${departmentId}/employees`
   },
   inventories: {
     root: "/dashboard/inventories",
     create: "/dashboard/inventories/create",
     update: (inventoryId: number) => `/dashboard/inventories/${inventoryId}/update`,
-    view: (inventoryId: number) => `/dashboard/inventories/${inventoryId}`
+    view: (inventoryId: number) => `/dashboard/inventories/${inventoryId}`,
+    medicine: (inventoryId: number) => `/dashboard/inventories/${inventoryId}/medicine`
   },
   prescriptions: {
     root: "/dashboard/prescriptions",
     create: "/dashboard/prescriptions/create",
     update: (prescriptionId: number) => `/dashboard/prescriptions/${prescriptionId}/update`,
     view: (prescriptionId: number) => `/dashboard/prescriptions/${prescriptionId}`,
-    createPrescrptionItem: (prescriptionId: number) =>
-      `/dashboard/prescriptions/${prescriptionId}/create-item`,
+    createPrescrptionItem: (prescriptionId: number) => `/dashboard/prescriptions/${prescriptionId}/create-item`,
 
-    updatePrescrptionItem: (prescriptionId: number) =>
-      `/dashboard/prescriptions/${prescriptionId}/items/${prescriptionId}`
+    updatePrescrptionItem: (prescriptionId: number) => `/dashboard/prescriptions/${prescriptionId}/items/${prescriptionId}`
   }
 }

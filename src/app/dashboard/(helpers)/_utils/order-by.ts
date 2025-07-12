@@ -4,4 +4,5 @@ export const OrderBy = {
   permissionEmployees: [{ label: "Name", name: "name" }],
   departments: [{ label: "Name", name: "name" }],
   inventories: [{ label: "Name", name: "name" }],
+  products: [{ label: "Name", name: "name" }]
 }

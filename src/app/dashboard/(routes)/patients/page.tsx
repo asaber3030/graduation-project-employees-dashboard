@@ -3,20 +3,13 @@ import FilterAll from "@/app/dashboard/(helpers)/_components/common/filter"
 import Image from "next/image"
 import Link from "next/link"
 
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PatientActionsDropdown } from "@/app/dashboard/(helpers)/_components/patients/patient-actions-dropdown"
 import { DefaultTableFooter } from "@/app/dashboard/(helpers)/_components/common/table-footer"
+import { SearchParams } from "@/types"
 import { EmptyState } from "@/components/common/empty-state"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import { SearchParams } from "@/types"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table"
 
 import { diffForHuman, formatDate } from "@/lib/utils"
 import { userImagePlaceholder } from "@/lib/constants"
@@ -33,13 +26,7 @@ export default async function Patients({ searchParams }: { searchParams: SearchP
   const hasAccessToUpdatePromise = hasAccessTo("patients", "update-patinet")
   const hasAccessToDeletePromise = hasAccessTo("patients", "delete-patinet")
 
-  const [hasAccessToView, hasAccessToCreate, hasAccessToUpdate, hasAccessToDelete] =
-    await Promise.all([
-      hasAccessToViewPromise,
-      hasAccessToCreatePromise,
-      hasAccessToUpdatePromise,
-      hasAccessToDeletePromise
-    ])
+  const [hasAccessToView, hasAccessToCreate, hasAccessToUpdate, hasAccessToDelete] = await Promise.all([hasAccessToViewPromise, hasAccessToCreatePromise, hasAccessToUpdatePromise, hasAccessToDeletePromise])
 
   if (!hasAccessToView) return redirect(employeesRoutes.dashboard.root)
 
@@ -55,11 +42,7 @@ export default async function Patients({ searchParams }: { searchParams: SearchP
         )}
       </AdminPageTitle>
 
-      <FilterAll
-        searchParams={searchParams}
-        orderByArray={[{ label: "Name", name: "name" }]}
-        parentClassName='mb-4'
-      />
+      <FilterAll searchParams={searchParams} orderByArray={[{ label: "Name", name: "name" }]} parentClassName='mb-4' />
 
       {patients.patients.length === 0 ? (
         <EmptyState />
@@ -81,19 +64,13 @@ export default async function Patients({ searchParams }: { searchParams: SearchP
                 <TableRow key={`doctor-row-${patient.id}`}>
                   <TableCell className='font-medium'>{patient.id}</TableCell>
                   <TableCell>{patient.name}</TableCell>
-                  <TableCell>
-                    {patient.birthDate ? formatDate(patient.birthDate, "l") : "N/A"}
-                  </TableCell>
+                  <TableCell>{patient.birthDate ? formatDate(patient.birthDate, "l") : "N/A"}</TableCell>
                   <TableCell>
                     <Image src={userImagePlaceholder} width={40} height={40} alt='doctor Logo' />
                   </TableCell>
                   <TableCell>{diffForHuman(patient.updatedAt)}</TableCell>
                   <TableCell className='text-right space-x-2'>
-                    <PatientActionsDropdown
-                      hasAccessToUpdate={hasAccessToUpdate}
-                      hasAccessToDelete={hasAccessToDelete}
-                      patient={patient}
-                    />
+                    <PatientActionsDropdown hasAccessToUpdate={hasAccessToUpdate} hasAccessToDelete={hasAccessToDelete} patient={patient} />
                   </TableCell>
                 </TableRow>
               ))}

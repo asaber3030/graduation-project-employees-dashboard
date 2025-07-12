@@ -8,7 +8,7 @@ import { useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { updateHospitalAction } from "../../_actions/hospitals"
-import { employeesRoutes } from "../../_utils/routes"
+import { adminRoutes } from "../../_utils/routes"
 import { showResponseMessage } from "@/lib/utils"
 
 import { HospitalSchema } from "@/schema"
@@ -35,13 +35,13 @@ export const UpdateHospitalForm = ({ hospital }: { hospital: Hospital }) => {
     defaultValues: {
       name: hospital.name,
       description: hospital.description,
-      location: hospital.location
-    }
+      location: hospital.location,
+    },
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ data, formData }: Mutation) => updateHospitalAction(hospital.id, data, formData),
-    onSuccess: (data) => showResponseMessage(data)
+    onSuccess: (data) => showResponseMessage(data),
   })
 
   const handleUpdate = () => {
@@ -52,36 +52,36 @@ export const UpdateHospitalForm = ({ hospital }: { hospital: Hospital }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleUpdate)} className='space-y-4'>
+      <form onSubmit={form.handleSubmit(handleUpdate)} className="space-y-4">
         <FileField
-          label='Hospital Logo'
+          label="Hospital Logo"
           icon={FileIcon}
           onChange={(event) => setFile(event.target.files?.[0])}
         />
 
-        <InputField name='name' placeholder='Name' label='Name' control={form.control} />
+        <InputField name="name" placeholder="Name" label="Name" control={form.control} />
 
         <InputField
-          name='description'
-          placeholder='Description'
-          label='Description'
+          name="description"
+          placeholder="Description"
+          label="Description"
           control={form.control}
           isTextarea
         />
 
         <InputField
-          name='location'
-          placeholder='location'
-          label='Location'
+          name="location"
+          placeholder="location"
+          label="Location"
           control={form.control}
         />
 
-        <div className='flex gap-2'>
-          <LoadingButton variant='blue' loading={updateMutation.isPending}>
+        <div className="flex gap-2">
+          <LoadingButton variant="blue" loading={updateMutation.isPending}>
             Update
           </LoadingButton>
-          <Link href={employeesRoutes.hospitals.root}>
-            <Button variant='outline'>Cancel</Button>
+          <Link href={adminRoutes.hospitals.root}>
+            <Button variant="outline">Cancel</Button>
           </Link>
         </div>
       </form>

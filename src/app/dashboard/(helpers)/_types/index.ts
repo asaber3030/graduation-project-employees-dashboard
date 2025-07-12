@@ -1,20 +1,4 @@
-import {
-  Prescription,
-  Doctor,
-  Patient,
-  PatientMedication,
-  Medicine,
-  PatientVaccination,
-  PrescriptionItem,
-  Hospital,
-  Department,
-  Inventory,
-  Employee,
-  DosageForm,
-  ResourcePermissionGroup,
-  ResourcePermission,
-  EmployeePermission,
-} from "@prisma/client"
+import { Prescription, Doctor, Patient, PatientMedication, Medicine, PatientVaccination, PrescriptionItem, Hospital, Department, Inventory, Employee, DosageForm, ResourcePermissionGroup, ResourcePermission, EmployeePermission, Order, OrderItem, Product, Category } from "@prisma/client"
 
 export type ATFullPrescritpion = Prescription & {
   doctor: Doctor
@@ -82,4 +66,15 @@ export type CreateNotificationEntry = {
   title: string
   description?: string
   url?: string
+}
+
+export type FullOrder = Order & {
+  items: (OrderItem & {
+    product: Product
+  })[]
+  patient: Patient
+}
+
+export type FullProduct = Product & {
+  category: Category
 }

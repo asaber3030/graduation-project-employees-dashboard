@@ -7,6 +7,7 @@ import { APIResponse } from "@/types"
 
 import { API_URL, COOKIE_NAME, defaultExpirationToken } from "@/lib/constants"
 import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export async function loginAction(data: z.infer<typeof LoginSchema>, rememberMe: boolean = false) {
   try {
@@ -16,6 +17,7 @@ export async function loginAction(data: z.infer<typeof LoginSchema>, rememberMe:
     })
 
     const response: APIResponse<{ token: string }, any> = await res.json()
+
     if (response.data?.token) {
       cookies().set(COOKIE_NAME, response?.data.token, {
         expires: defaultExpirationToken
@@ -26,4 +28,9 @@ export async function loginAction(data: z.infer<typeof LoginSchema>, rememberMe:
   } catch (error) {
     console.dir({ fromLoginAction: error }, { depth: null })
   }
+}
+
+export async function logoutAction() {
+  cookies().delete(COOKIE_NAME)
+  return redirect("/login")
 }

@@ -1,7 +1,7 @@
 // https://techmed-employees.vercel.app/api
 // http://localhost:3000/api
 
-export const API_URL = "https://techmed-employees.vercel.app/api"
+export const API_URL = process.env.NEXT_PUBLIC_API_URL
 export const COOKIE_NAME = "techmed-employee-token"
 export const defaultExpirationToken = Date.now() + 24 * 60 * 60 * 1000 * 30
 export const userImagePlaceholder = `/logo.png`
@@ -18,7 +18,10 @@ export const resourcesIcons = {
   vaccinations: "/defaults/resources/vaccinations.svg",
   invoices: "/defaults/resources/invoices.svg",
   permissions: "/defaults/resources/permissions.svg",
-  logs: "/defaults/resources/logs.svg"
+  logs: "/defaults/resources/logs.svg",
+  products: "/defaults/resources/products.svg",
+  categories: "/defaults/resources/categories.svg",
+  orders: "/defaults/resources/orders.svg"
 }
 
 export const osIcons = {

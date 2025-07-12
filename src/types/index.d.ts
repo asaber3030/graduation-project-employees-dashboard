@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { LoginSchema } from "@/schema"
+import { Order, OrderItem, Patient, Product } from "@prisma/client"
 
 export type SearchParams = {
   search?: string
@@ -28,3 +29,10 @@ export type LoginData = {
 }
 
 export type Languages = "en" | "ar"
+
+export type FullOrder = Order & {
+  items: (OrderItem & {
+    product: Product
+  })[]
+  patient: Patient
+}

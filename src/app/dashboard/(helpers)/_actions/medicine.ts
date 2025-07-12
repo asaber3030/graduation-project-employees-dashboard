@@ -3,11 +3,10 @@
 import db from "@/services/prisma"
 
 import { actionResponse, responseCodes } from "@/lib/api"
-import { currentHospital, uploadFile } from "@/actions/app"
+import { currentHospital, uploadToCloudinary } from "@/actions/app"
 import { createPagination } from "@/lib/utils"
 import { revalidatePath } from "next/cache"
 import { employeesRoutes } from "../_utils/routes"
-import { v4 as uuid } from "uuid"
 import { z } from "zod"
 
 import { MedicineSchema } from "@/schema"
@@ -30,10 +29,7 @@ export async function paginateMedicine(searchParams: SearchParams) {
   const pagination = createPagination(searchParams, total)
   const medicine = await db.medicine.findMany({
     where: {
-      OR: [
-        { enName: { contains: searchParams.search ?? "" } },
-        { arName: { contains: searchParams.search ?? "" } }
-      ],
+      OR: [{ enName: { contains: searchParams.search ?? "" } }, { arName: { contains: searchParams.search ?? "" } }],
       hospitalId: hospital.id
     },
     include: { dosageForm: true, hospital: true },
@@ -56,17 +52,12 @@ export async function searchMedicine(search?: string) {
   return medicine
 }
 
-export async function updateMedicineAction(
-  medicineId: number,
-  dosageFormId: number,
-  inventoryId: number,
-  data: z.infer<typeof MedicineSchema.update>,
-  formData?: FormData
-) {
+export async function updateMedicineAction(medicineId: number, dosageFormId: number, inventoryId: number, data: z.infer<typeof MedicineSchema.update>, formData?: FormData) {
   const medicine = await db.medicine.findUnique({
     where: { id: medicineId },
     select: { image: true, barcode: true, id: true }
   })
+
   let image = medicine?.image
   let barcode = medicine?.barcode
 
@@ -74,16 +65,12 @@ export async function updateMedicineAction(
     const imageFile = formData.get("image") as File
     const barcodeFile = formData.get("barcode") as File
 
-    if (imageFile) {
-      const imageFileName = uuid() + "_" + imageFile.name
-      const imagePath = `medicine/${imageFileName}`
-      image = await uploadFile(imageFile, "main", imagePath)
+    if (imageFile && imageFile.size > 0) {
+      image = await uploadToCloudinary(imageFile, "medicine")
     }
 
-    if (barcodeFile) {
-      const barCodeFileName = uuid() + "_" + barcodeFile.name
-      const barcodePath = `medicine/${barCodeFileName}`
-      barcode = await uploadFile(barcodeFile, "main", barcodePath)
+    if (barcodeFile && barcodeFile.size > 0) {
+      barcode = await uploadToCloudinary(barcodeFile, "medicine")
     }
   }
 
@@ -103,12 +90,7 @@ export async function updateMedicineAction(
   return actionResponse(responseCodes.ok, "Medicine updated successfully")
 }
 
-export async function createMedicineAction(
-  dosageFormId: number,
-  inventoryId: number,
-  data: z.infer<typeof MedicineSchema.create>,
-  formData: FormData
-) {
+export async function createMedicineAction(dosageFormId: number, inventoryId: number, data: z.infer<typeof MedicineSchema.create>, formData: FormData) {
   if (!dosageFormId) return actionResponse(400, "Dosage Form is required")
   if (!inventoryId) return actionResponse(400, "Inventory is required")
 
@@ -117,17 +99,11 @@ export async function createMedicineAction(
   const imageFile = formData.get("image") as File
   const barcodeFile = formData.get("barcode") as File
 
-  if (!imageFile) return actionResponse(400, "Image is required")
-  if (!barcodeFile) return actionResponse(400, "Barcode Image is required")
+  if (!imageFile || imageFile.size === 0) return actionResponse(400, "Image is required")
+  if (!barcodeFile || barcodeFile.size === 0) return actionResponse(400, "Barcode Image is required")
 
-  const imageFileName = uuid() + "_" + imageFile.name
-  const barCodeFileName = uuid() + "_" + barcodeFile.name
-
-  const imagePath = `medicine/${imageFileName}`
-  const barcodePath = `medicine/${barCodeFileName}`
-
-  const image = await uploadFile(imageFile, "main", imagePath)
-  const barcode = await uploadFile(barcodeFile, "main", barcodePath)
+  const image = await uploadToCloudinary(imageFile, "medicine")
+  const barcode = await uploadToCloudinary(barcodeFile, "medicine")
 
   await db.medicine.create({
     data: {
@@ -143,7 +119,6 @@ export async function createMedicineAction(
   revalidatePath(employeesRoutes.medicine.root)
   return actionResponse(responseCodes.ok, "Medicine created successfully")
 }
-
 export async function deleteMedicineAction(id: number) {
   try {
     await db.medicine.delete({

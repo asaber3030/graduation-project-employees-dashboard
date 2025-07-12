@@ -9,7 +9,6 @@ import { AdminNavbar } from "../(helpers)/_components/common/navbar/navbar"
 import { getCurrentEmployee } from "../(helpers)/_actions/auth"
 import { employeesRoutes } from "../(helpers)/_utils/routes"
 import { currentHospital } from "@/actions/app"
-import { hasAccessTo } from "../(helpers)/_actions/access"
 import { redirect } from "next/navigation"
 
 export default async function AdminRootLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +27,6 @@ export default async function AdminRootLayout({ children }: { children: React.Re
     }
   })
 
-  const hasA = await hasAccessTo("doctors", "create-doctor")
   const hospital = await currentHospital()
 
   return (

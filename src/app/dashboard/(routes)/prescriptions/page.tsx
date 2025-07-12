@@ -18,13 +18,7 @@ export default async function Prescriptions({ searchParams }: { searchParams: Se
   const hasAccessToUpdatePromise = hasAccessTo("prescriptions", "update-prescription")
   const hasAccessToDeletePromise = hasAccessTo("prescriptions", "delete-prescription")
 
-  const [hasAccessToView, hasAccessToCreate, hasAccessToUpdate, hasAccessToDelete] =
-    await Promise.all([
-      hasAccessToViewPromise,
-      hasAccessToCreatePromise,
-      hasAccessToUpdatePromise,
-      hasAccessToDeletePromise
-    ])
+  const [hasAccessToView, hasAccessToCreate, hasAccessToUpdate, hasAccessToDelete] = await Promise.all([hasAccessToViewPromise, hasAccessToCreatePromise, hasAccessToUpdatePromise, hasAccessToDeletePromise])
 
   if (!hasAccessToView) return redirect(employeesRoutes.dashboard.root)
 
@@ -38,13 +32,7 @@ export default async function Prescriptions({ searchParams }: { searchParams: Se
         )}
       </AdminPageTitle>
 
-      <AdminPrescriptionsTable
-        data={prescriptions.prescriptions}
-        searchParams={searchParams}
-        hasNextPage={prescriptions.hasNextPage}
-        hasAccessToUpdate={hasAccessToUpdate}
-        hasAccessToDelete={hasAccessToDelete}
-      />
+      <AdminPrescriptionsTable data={prescriptions.prescriptions} searchParams={searchParams} hasNextPage={prescriptions.hasNextPage} hasAccessToUpdate={hasAccessToUpdate} hasAccessToDelete={hasAccessToDelete} />
     </div>
   )
 }

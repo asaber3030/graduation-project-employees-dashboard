@@ -4,19 +4,34 @@ import supabase from "@/services/supabase"
 import bcrypt from "bcrypt"
 import db from "@/services/prisma"
 
+import { v2 as cloudinary } from "cloudinary"
+
 import { Hospital, Prisma } from "@prisma/client"
 import { cookies } from "next/headers"
 import { actionResponse } from "@/lib/api"
 import { ADMIN_COOKIE_HOSPITAL_ID } from "@/app/dashboard/(helpers)/_utils/constants"
 
-export async function uploadFile(file: File, bucketName: string, fileName: string) {
-  const { error } = await supabase.storage.from("main").upload(fileName, file, {
-    cacheControl: "3600",
-    upsert: false
-  })
-  if (error) throw new Error(error.message)
-  const publicUrl = supabase.storage.from("main").getPublicUrl(fileName).data.publicUrl
-  return publicUrl
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+  api_key: process.env.CLOUDINARY_API_KEY!,
+  api_secret: process.env.CLOUDINARY_API_SECRET!
+})
+
+export async function uploadToCloudinary(file: File, folder: string = "all_files"): Promise<string> {
+  const buffer = await file.arrayBuffer()
+  const base64 = Buffer.from(buffer).toString("base64")
+  const dataUrl = `data:${file.type};base64,${base64}`
+
+  try {
+    const result = await cloudinary.uploader.upload(dataUrl, {
+      folder: folder ?? "uploads"
+    })
+
+    return result.secure_url
+  } catch (error) {
+    console.error("Cloudinary upload failed:", error)
+    throw new Error("Upload to Cloudinary failed")
+  }
 }
 
 export async function getHospitals() {

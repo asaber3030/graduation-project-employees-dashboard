@@ -12,26 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Lock } from "lucide-react"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 interface Props {
   deletedId: number
@@ -42,14 +24,7 @@ interface Props {
   forceAction: (id: number) => Promise<APIResponse<any, any>>
 }
 
-export const DeleteModal = ({
-  dialogTitle = "Delete Action",
-  dialogDescription = "This action can be reversed later because of soft deletes but you can force delete this item.",
-  deletedId,
-  children,
-  asChild = true,
-  forceAction
-}: Props) => {
+export const DeleteModal = ({ dialogTitle = "Delete Action", dialogDescription = "This action can be reversed later because of soft deletes but you can force delete this item.", deletedId, children, asChild = true, forceAction }: Props) => {
   const [open, setOpen] = useState(false)
   const [secondaryModal, setSecondaryModal] = useState(false)
   const [password, setPassword] = useState("")
@@ -92,7 +67,7 @@ export const DeleteModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild={asChild}>{children}</DialogTrigger>
-      <DialogContent className="bg-white">
+      <DialogContent className='bg-white'>
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
@@ -100,13 +75,7 @@ export const DeleteModal = ({
 
         <section>
           <Label>Application Password</Label>
-          <Input
-            icon={Lock}
-            placeholder="Enter application password"
-            value={password}
-            type="password"
-            onChange={(event) => setPassword(event.target.value)}
-          />
+          <Input icon={Lock} placeholder='Enter application password' value={password} type='password' onChange={(event) => setPassword(event.target.value)} />
         </section>
 
         {isPasswordVerified && (
@@ -114,16 +83,14 @@ export const DeleteModal = ({
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Please make sure before processing, This action is not reversible
-                </AlertDialogDescription>
+                <AlertDialogDescription>Please make sure before processing, This action is not reversible</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant='outline'>Cancel</Button>
                 </AlertDialogCancel>
                 <AlertDialogAction asChild>
-                  <Button variant="destructive" onClick={handleDelete}>
+                  <Button variant='destructive' onClick={handleDelete}>
                     Submit
                   </Button>
                 </AlertDialogAction>
@@ -134,13 +101,9 @@ export const DeleteModal = ({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Close</Button>
+            <Button variant='outline'>Close</Button>
           </DialogClose>
-          <LoadingButton
-            loading={forceDeleteMutation.isPending}
-            variant="destructive"
-            onClick={handleVerifyPassword}
-          >
+          <LoadingButton loading={forceDeleteMutation.isPending} variant='destructive' onClick={handleVerifyPassword}>
             Force Delete
           </LoadingButton>
         </DialogFooter>
